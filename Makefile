@@ -1,5 +1,5 @@
 CC=gcc
-OMP_CC=gcc -fopenmp -lm
+CFLAGS=-fopenmp -lm
 SOLVED_C=${wildcard omp_solved*.c}
 GRID_SOLVERS_C=jacobi2D-omp.c gs2D-omp.c
 SOLVED=${SOLVED_C:.c=}
@@ -8,8 +8,15 @@ EXEC=${SOLVED} ${GRID_SOLVERS}
 
 all: ${EXEC}
 
-${EXEC} : % : %.c
-	${OMP_CC} $^ -o $@
+${SOLVED} : % : %.c
+	${CC} ${CFLAGS} $^ -o $@
+
+${GRID_SOLVERS} : % : %.c
+ifeq (${SERIAL}, [tT])
+	${CC} ${CFLAGS} $^ -o $@
+else
+	${CC} -lm $^ -o $@
+endif
 
 clean:
 	rm -f ${SOLVED} ${GRID_SOLVERS}
