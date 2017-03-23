@@ -28,7 +28,7 @@ omp_lock_t lock;
 omp_init_lock(&lock);
 
 /* Fork a team of threads giving them their own copies of variables */
-#pragma omp parallel shared(a, b, nthreads, locka, lockb) private(tid)
+#pragma omp parallel shared(a, b, nthreads, lock) private(tid)
   {
 
   /* Obtain thread number and number of threads */
@@ -84,7 +84,7 @@ omp_init_lock(&lock);
 
     #pragma omp section
       {
-      omp_set_lock(&lock)
+      omp_set_lock(&lock);
       printf("Thread %d adding b[] to a[]\n",tid);
       for (i=0; i<N; i++)
         a[i] += b[i];
@@ -94,8 +94,7 @@ omp_init_lock(&lock);
     }  /* end of sections */
   }  /* end of parallel region */
 
-  omp_destroy_lock(&locka);
-  omp_destroy_lock(&lockb);
+  omp_destroy_lock(&lock);
 
 }
 
